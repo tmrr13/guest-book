@@ -25,38 +25,29 @@ button.onclick = function(){
   localStorage.setItem('messages', JSON.stringify(message))
 };
 
-function render() {
+  var pageSize = 10;
+function render(p) {
+  var page = p || 1;
   form.innerHTML = "";
-  for(i = 0; i < message.length; i++) {
+  for(i = pageSize * (page - 1); i < (pageSize * page); i++) {
     var div = document.createElement("div");
     var user = message[i];
     div.innerHTML = user.name + user.text + new Date(user.time);
     form.appendChild(div);
   }
+  paginaton();
 }
 
 render();
 
-var number = document.getElementById('number');
-var pagNumber;
-var page = "";
-
 function paginaton() {
-  if (message.length <= 5) {
-    pagNumber = 1;
-  } else {
-    pagNumber = Math.ceil(message.length / 5);
-  }
+  var page = "";
+  var pagNumber = Math.ceil(message.length / pageSize);
+
   for (var i = 0; i < pagNumber; i++) {
     page += "<a href='javascript:void(0)'" + " id=\"page" + (i + 1) + "\">" + (i + 1) + "</a>";
   }
   paginationContainer.innerHTML = page;
 }
 
-paginaton();
-
-for (var i = 0; i < form.length; i++) {
-  if (i < cnt) {
-    form[i].style.display = "block";
-  }
-}
+setTimeout(render, 5000, 2);
