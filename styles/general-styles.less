@@ -1,0 +1,38 @@
+@import "./reset.less";
+@import "./variables.less";
+
+html,
+body,
+.page {
+  height: 100%;
+}
+
+.page {
+  background: @light;
+  max-width: 720px;
+  margin: auto;
+}
+
+.content-page {
+  background: @gray;
+  min-height: ~"calc(100% - 80px)";
+}
+
+.my-form {
+  display: flex;
+}
+
+.field-text {
+  border: 1px solid @primary;
+  flex-grow: 1;
+  margin-right: 8px;
+}
+
+.btn {
+  cursor: pointer;
+  float: right;
+  padding: 4px 12px;
+  background: @primary;
+  border: 1px solid black;
+  color: @light;
+}
