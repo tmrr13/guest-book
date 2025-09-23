@@ -1,0 +1,23 @@
+<div class="mt-6 px-6 py-4 inline-flex items-center w-full has-[label:focus-visible]:outline has-[label:focus-visible]:outline-1
+                        has-[label:focus-visible]:outline-cipher-80 rounded-lg">
+                <label
+                    for="sendBulkEmail"
+                    @click="toggleSendBulkEmail"
+                    class="flex items-center cursor-pointer relative outline-none"
+                >
+                  <input
+                      placeholder="${'empathylab.forms.yourMessage' @ i18n}*"
+                      type="checkbox"
+                      @change="toggleSendBulkEmail"
+                      @keydown.enter.prevent="toggleSendBulkEmail"
+                      @keydown.space.prevent="toggleSendBulkEmail"
+                      class="peer shrink-0 h-6 w-6 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border-2 border-[#021227D9]"
+                      id="sendBulkEmail" />
+                  <span class="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-[12px] transform -translate-x-1/2 -translate-y-1/2">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M24.0391 4.05984V19.9903C24.0391 22.6758 22.6833 24.0186 19.9456 24.0186H4.1325C1.40789 24.0186 0.0390625 22.6758 0.0390625 19.9903V4.05984C0.0390625 1.37434 1.40789 0.0185547 4.1325 0.0185547H19.9456C22.6833 0.0185547 24.0391 1.37434 24.0391 4.05984ZM16.0999 6.8366L10.5334 15.7796L7.88698 12.3641C7.56107 11.9338 7.27427 11.8165 6.90925 11.8165C6.30957 11.8165 5.8533 12.2989 5.8533 12.8855C5.8533 13.1853 5.97063 13.4722 6.16617 13.7328L9.43831 17.7481C9.77726 18.2044 10.1423 18.3868 10.5855 18.3868C11.0288 18.3868 11.4069 18.1782 11.6805 17.7481L17.8077 8.10112C17.9772 7.82736 18.1336 7.52752 18.1336 7.24073C18.1336 6.62802 17.5991 6.23692 17.0385 6.23692C16.6865 6.23692 16.3477 6.4455 16.0999 6.8366Z" fill="#021227"/>
+                    </svg>
+                  </span>
+                  <span class="cursor-pointer text-sm pl-4 text-cipher-100 leading-140" x-text="checkboxText"></span>
+                </label>
+              </div>
