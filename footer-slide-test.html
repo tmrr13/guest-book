@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Footer Slide Test - Mouse Drag</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 200vh; /* Make page scrollable */
+            background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+        }
+        
+        .content {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .footer-wrapper {
+            position: relative;
+        }
+        
+        .footer-wrapper > div {
+            background: #333;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            min-height: 300px;
+            cursor: grab;
+        }
+        
+        .footer-wrapper > div:active {
+            cursor: grabbing;
+        }
+        
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .footer-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        
+        .drag-hint {
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        h1, h2, h3 {
+            margin-top: 0;
+        }
+        
+        .test-instructions {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>Footer Slide Test</h1>
+        
+        <div class="test-instructions">
+            <h3>How to test mouse drag functionality:</h3>
+            <ol>
+                <li>Scroll to the bottom of the page</li>
+                <li>Try these interactions with the footer:
+                    <ul>
+                        <li><strong>Mouse wheel:</strong> Scroll up/down to reveal/hide footer</li>
+                        <li><strong>Mouse drag:</strong> Click and drag up/down to reveal/hide footer</li>
+                        <li><strong>Keyboard:</strong> Use arrow keys, Page Up/Down, or spacebar</li>
+                        <li><strong>Touch:</strong> On mobile, swipe up/down</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+        
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        
+        <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+        
+        <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
+        
+        <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.</p>
+        
+        <p><strong>Scroll down to see the footer and test the mouse drag functionality!</strong></p>
+    </div>
+    
+    <div class="footer-wrapper">
+        <div>
+            <div id="new-footer" class="footer-content">
+                <div class="drag-hint">
+                    🖱️ Click and drag here to reveal/hide the footer!
+                </div>
+                
+                <div class="footer-section">
+                    <h2>Footer Section 1</h2>
+                    <p>This is the footer content. You can now drag with your mouse to reveal or hide this footer!</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Mouse Drag Features:</h3>
+                    <ul>
+                        <li>Click and drag up to reveal more footer content</li>
+                        <li>Click and drag down to hide the footer</li>
+                        <li>Smooth animation with parallax effect</li>
+                        <li>Works alongside wheel, touch, and keyboard controls</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Footer Section 3</h3>
+                    <p>Additional footer content to demonstrate the scrolling functionality. The footer will smoothly animate as you drag.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import and initialize the footer controller
+        // Note: In a real implementation, you would compile the TypeScript to JavaScript
+        // For this demo, we'll include the JavaScript version inline
+        
+        function createFooterController() {
+            return {
+                _footerSlide: null,
+
+                initFooterSlide(options = {}) {
+                    const clamp01 = (v) => Math.max(0, Math.min(1, v));
+                    const clamp = (v, minV, maxV) => Math.max(minV, Math.min(maxV, v));
+                    const lerp = (a, b, t) => a + (b - a) * t;
+
+                    const {
+                        footerId,
+                        maxReveal = 1,
+                        parallaxRatio = 0.25,
+                        maxStepPx = 32,
+                        smoothness = 0.18,
+                        throttleMs = 40,
+                        breakpointFullPx = 1240,
+                        keyDeltaPx = 80,
+                        focusPaddingPx = 16,
+                        ignoreMouseFocus = true,
+                        zIndex = '9999'
+                    } = options;
+
+                    if (!footerId) return;
+                    const child = document.getElementById(footerId);
+                    if (!child) return;
+
+                    let footerEl = child.closest('.footer-wrapper > div');
+                    if (!footerEl) {
+                        const wrapper = child.closest('.footer-wrapper');
+                        if (wrapper) {
+                            footerEl = wrapper.querySelector(':scope > div');
+                        }
+                    }
+                    if (!footerEl) return;
+
+                    let footerHeight = Math.max(1, footerEl.offsetHeight);
+
+                    const original = {
+                        position: footerEl.style.position,
+                        left: footerEl.style.left,
+                        right: footerEl.style.right,
+                        bottom: footerEl.style.bottom,
+                        transform: footerEl.style.transform,
+                        willChange: footerEl.style.willChange,
+                        transition: footerEl.style.transition,
+                        zIndex: footerEl.style.zIndex
+                    };
+
+                    Object.assign(footerEl.style, {
+                        position: 'fixed',
+                        left: '0',
+                        right: '0',
+                        bottom: '0',
+                        transform: `translate3d(0, ${footerHeight}px, 0)`,
+                        willChange: 'transform',
+                        transition: 'none',
+                        zIndex: original.zIndex || zIndex
+                    });
+
+                    const state = this._footerSlide = {
+                        footer: footerEl,
+                        original,
+                        maxReveal: clamp01(maxReveal),
+                        parallaxRatio,
+                        maxStepPx,
+                        smoothness,
+                        throttleMs,
+                        breakpointFullPx,
+                        keyDeltaPx,
+                        focusPaddingPx,
+                        ignoreMouseFocus: !!ignoreMouseFocus,
+
+                        currentY: footerHeight,
+                        targetY: footerHeight,
+                        revealedPx: 0,
+                        rafId: 0,
+
+                        lastTouchY: null,
+                        lastMouseY: null,
+                        isDragging: false,
+                        lastInput: 'mouse'
+                    };
+
+                    const isAtBottom = () => {
+                        const doc = document.documentElement;
+                        return Math.ceil(window.scrollY + window.innerHeight) >= doc.scrollHeight;
+                    };
+
+                    const getEffectiveMaxRevealPx = () => {
+                        const isMobile = window.innerWidth < state.breakpointFullPx;
+                        const effectiveMaxReveal = isMobile ? 1 : state.maxReveal;
+                        return footerHeight * effectiveMaxReveal;
+                    };
+
+                    const requestTick = () => {
+                        if (!state.rafId) state.rafId = requestAnimationFrame(tick);
+                    };
+
+                    const tick = () => {
+                        state.rafId = 0;
+                        state.currentY = lerp(state.currentY, state.targetY, state.smoothness);
+                        if (Math.abs(state.currentY - state.targetY) < 0.4) {
+                            state.currentY = state.targetY;
+                        }
+                        state.footer.style.transform = `translate3d(0, ${state.currentY}px, 0)`;
+                        if (Math.abs(state.currentY - state.targetY) >= 0.4) requestTick();
+                    };
+
+                    const setReveal = (valPx) => {
+                        const cap = getEffectiveMaxRevealPx();
+                        state.revealedPx = clamp(valPx, 0, cap);
+                        state.targetY = Math.round(footerHeight - state.revealedPx);
+                        requestTick();
+                    };
+
+                    const handleRevealDelta = (rawDeltaY) => {
+                        if (!isAtBottom()) return false;
+
+                        const cap = getEffectiveMaxRevealPx();
+                        const goingDown = rawDeltaY > 0;
+                        const goingUp = rawDeltaY < 0;
+
+                        if (goingDown && state.revealedPx >= cap - 0.1) return true;
+                        if (goingUp && state.revealedPx <= 0.1) return false;
+
+                        const step = Math.min(Math.abs(rawDeltaY) * state.parallaxRatio, state.maxStepPx);
+                        if (goingDown) {
+                            setReveal(state.revealedPx + step);
+                            return true;
+                        } else if (goingUp) {
+                            setReveal(state.revealedPx - step);
+                            return state.revealedPx > 0.1;
+                        }
+                        return false;
+                    };
+
+                    function throttle(fn, wait) {
+                        let waiting = false;
+                        let pending = false;
+                        return (...args) => {
+                            if (waiting) {
+                                pending = true;
+                                return;
+                            }
+                            fn(...args);
+                            waiting = true;
+                            window.setTimeout(() => {
+                                waiting = false;
+                                if (pending) {
+                                    pending = false;
+                                    fn(...args);
+                                }
+                            }, wait);
+                        };
+                    }
+
+                    const onScroll = throttle(() => {
+                        if (!isAtBottom()) {
+                            if (state.revealedPx > 0) {
+                                setReveal(0);
+                            } else {
+                                state.targetY = footerHeight;
+                                requestTick();
+                            }
+                        }
+                    }, state.throttleMs);
+
+                    const onWheel = (e) => {
+                        if (handleRevealDelta(e.deltaY)) {
+                            e.preventDefault();
+                        }
+                    };
+
+                    const onTouchStart = (e) => {
+                        state.lastInput = 'touch';
+                        state.lastTouchY = e.touches && e.touches.length ? e.touches[0].clientY : null;
+                    };
+
+                    const onTouchMove = (e) => {
+                        if (state.lastTouchY == null) return;
+                        const currentY = e.touches && e.touches.length ? e.touches[0].clientY : state.lastTouchY;
+                        const deltaY = state.lastTouchY - currentY;
+                        state.lastTouchY = currentY;
+                        if (handleRevealDelta(deltaY)) {
+                            e.preventDefault();
+                        }
+                    };
+
+                    // Mouse drag functionality
+                    const onMouseDown = (e) => {
+                        // Only handle left mouse button
+                        if (e.button !== 0) return;
+                        
+                        state.lastInput = 'mouse';
+                        state.isDragging = true;
+                        state.lastMouseY = e.clientY;
+                        
+                        // Prevent text selection during drag
+                        e.preventDefault();
+                        
+                        // Add cursor style to indicate dragging
+                        document.body.style.cursor = 'grabbing';
+                        document.body.style.userSelect = 'none';
+                    };
+
+                    const onMouseMove = (e) => {
+                        if (!state.isDragging || state.lastMouseY === null) return;
+                        
+                        const currentY = e.clientY;
+                        const deltaY = state.lastMouseY - currentY;
+                        state.lastMouseY = currentY;
+                        
+                        if (handleRevealDelta(deltaY)) {
+                            e.preventDefault();
+                        }
+                    };
+
+                    const onMouseUp = (e) => {
+                        if (!state.isDragging) return;
+                        
+                        state.isDragging = false;
+                        state.lastMouseY = null;
+                        
+                        // Reset cursor and selection
+                        document.body.style.cursor = '';
+                        document.body.style.userSelect = '';
+                    };
+
+                    const onKeyDown = (e) => {
+                        state.lastInput = 'keyboard';
+                        if (e.defaultPrevented) return;
+                        if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+                        let deltaRaw = 0;
+                        const vh = window.innerHeight;
+
+                        switch (e.key) {
+                            case 'ArrowDown':
+                                deltaRaw = +state.keyDeltaPx;
+                                break;
+                            case 'ArrowUp':
+                                deltaRaw = -state.keyDeltaPx;
+                                break;
+                            case 'PageDown':
+                                deltaRaw = +vh;
+                                break;
+                            case 'PageUp':
+                                deltaRaw = -vh;
+                                break;
+                            case ' ':
+                            case 'Spacebar':
+                                deltaRaw = e.shiftKey ? -vh * 0.8 : +vh * 0.8;
+                                break;
+                            default:
+                                return;
+                        }
+
+                        if (handleRevealDelta(deltaRaw)) {
+                            e.preventDefault();
+                        }
+                    };
+
+                    // Event listeners
+                    window.addEventListener('scroll', onScroll, { passive: true });
+                    window.addEventListener('wheel', onWheel, { passive: false });
+                    window.addEventListener('touchstart', onTouchStart, { passive: true });
+                    window.addEventListener('touchmove', onTouchMove, { passive: false });
+                    window.addEventListener('keydown', onKeyDown, { passive: false });
+                    
+                    // Mouse drag event listeners
+                    window.addEventListener('mousedown', onMouseDown, { passive: false });
+                    window.addEventListener('mousemove', onMouseMove, { passive: false });
+                    window.addEventListener('mouseup', onMouseUp, { passive: true });
+
+                    requestTick();
+                },
+
+                init() {
+                    this.initFooterSlide({
+                        footerId: 'new-footer',
+                        maxReveal: 1,
+                        parallaxRatio: 0.25,
+                        maxStepPx: 32,
+                        smoothness: 0.18,
+                        throttleMs: 40,
+                        breakpointFullPx: 1240,
+                        keyDeltaPx: 80,
+                        focusPaddingPx: 16,
+                        ignoreMouseFocus: true,
+                        zIndex: '9999'
+                    });
+                }
+            };
+        }
+
+        // Initialize the footer controller
+        const footerController = createFooterController();
+        footerController.init();
+        
+        console.log('Footer slide with mouse drag functionality initialized!');
+    </script>
+</body>
+</html>
