@@ -33,6 +33,36 @@ let days = outputDays();
 calendar.innerHTML = days;
 
 
+// Accessibility: Skip to main content behavior
+document.addEventListener('DOMContentLoaded', function () {
+  var skipLink = document.querySelector('.skip-link');
+  var main = document.getElementById('main-content');
+  if (!skipLink || !main) return;
+
+  function focusMain(event) {
+    // Prevent default jump to avoid double scroll on some browsers
+    if (event) event.preventDefault();
+    // Ensure main can be focused
+    if (!main.hasAttribute('tabindex')) {
+      main.setAttribute('tabindex', '-1');
+    }
+    main.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Defer focus to allow scroll/layout settle (Windows/Chrome, Safari)
+    setTimeout(function () {
+      main.focus({ preventScroll: true });
+    }, 0);
+  }
+
+  skipLink.addEventListener('click', focusMain);
+  skipLink.addEventListener('keydown', function (e) {
+    var key = e.key || e.code;
+    if (key === 'Enter' || key === ' ' || key === 'Spacebar' || key === 'Space') {
+      focusMain(e);
+    }
+  });
+});
+
+
 
 // console.log(daysWeek[new Date().getDay()]);
 
