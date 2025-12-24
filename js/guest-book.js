@@ -23,14 +23,25 @@ function outputDays() {
 }
 
 function outputDaysWeek() {
-  let daysWeeka = daysWeek;
+  // TODO: implement if needed
 }
 
-console.log(daysWeeka);
+// console.log(daysWeeka);
 
 let days = outputDays();
 
 calendar.innerHTML = days;
+
+// Footer: fully reveal on click of #footer-lang-select
+document.addEventListener('click', (e) => {
+  const target = e.target;
+  if (!(target instanceof Element)) return;
+  if (!target.closest('#footer-lang-select')) return;
+
+  const footer = document.getElementById('site-footer');
+  if (!footer) return;
+  footer.classList.add('is-open');
+});
 
 
 
