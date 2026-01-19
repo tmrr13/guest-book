@@ -23,14 +23,35 @@ function outputDays() {
 }
 
 function outputDaysWeek() {
-  let daysWeeka = daysWeek;
+  return daysWeek;
 }
 
+let daysWeeka = outputDaysWeek();
 console.log(daysWeeka);
 
 let days = outputDays();
 
 calendar.innerHTML = days;
+
+const heroTitles = document.querySelectorAll('.hero-title');
+if (heroTitles.length > 0) {
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          obs.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.4
+    });
+
+    heroTitles.forEach((title) => observer.observe(title));
+  } else {
+    heroTitles.forEach((title) => title.classList.add('is-visible'));
+  }
+}
 
 
 
