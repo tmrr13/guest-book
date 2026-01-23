@@ -1,4 +1,4 @@
-export default () => ({
+const footerLangSelectData = () => ({
   langSelectOpen: false,
   isSmall: window.innerWidth < 1240,
   _footerSlide: null,
@@ -187,3 +187,19 @@ export default () => ({
     }
   },
 });
+
+const registerFooterLangSelectData = () => {
+  if (typeof window === 'undefined' || !window.Alpine) {
+    return;
+  }
+
+  window.Alpine.data('footerLangSelectData', footerLangSelectData);
+};
+
+if (typeof document !== 'undefined') {
+  document.addEventListener('alpine:init', registerFooterLangSelectData);
+}
+
+registerFooterLangSelectData();
+
+export default footerLangSelectData;
