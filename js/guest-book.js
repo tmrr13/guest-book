@@ -8,6 +8,10 @@ let now = new Date(),
     nowYear = now.getFullYear();
     daysWeek = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
 
+function sanitizeHtml(html) {
+  return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
+}
+
 function daysInMonth (month, year) {
   return new Date(year, month, 0).getDate();
 }
@@ -30,7 +34,7 @@ console.log(daysWeeka);
 
 let days = outputDays();
 
-calendar.innerHTML = days;
+calendar.innerHTML = sanitizeHtml(days);
 
 
 
