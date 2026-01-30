@@ -1,7 +1,7 @@
 (() => {
   const CLASS_NAME = 'parallax-text';
   const DEFAULT_SPEED = 1;
-  const DEFAULT_DISTANCE = 1130;
+  const DEFAULT_RANGE = 100;
   const activeElements = new Set();
   const observedElements = new Set();
   let rafId = null;
@@ -18,8 +18,20 @@
   const getSpeed = (el) =>
     getNumber(el.getAttribute('data-parallax-speed'), DEFAULT_SPEED);
 
-  const getDistance = (el) =>
-    getNumber(el.getAttribute('data-parallax-distance'), DEFAULT_DISTANCE);
+  const getRange = (el) => {
+    const range = getNumber(
+      el.getAttribute('data-parallax-range'),
+      Number.NaN
+    );
+    if (Number.isFinite(range)) {
+      return range;
+    }
+    return getNumber(el.getAttribute('data-parallax-distance'), DEFAULT_RANGE);
+  };
+
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  const startTops = new WeakMap();
 
   const update = () => {
     if (activeElements.size === 0) {
@@ -30,8 +42,11 @@
     const vh = window.innerHeight || 1;
     activeElements.forEach((el) => {
       const rect = el.getBoundingClientRect();
-      const progress = 1 - rect.top / vh;
-      const offset = progress * getDistance(el) * getSpeed(el);
+      const startTop = startTops.get(el);
+      const baseline = Number.isFinite(startTop) ? startTop : rect.top;
+      const delta = baseline - rect.top;
+      const range = getRange(el);
+      const offset = clamp(delta * getSpeed(el), -range, range);
       el.style.transform = `translate3d(0, ${-offset}px, 0)`;
     });
 
@@ -58,8 +73,10 @@
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           activeElements.add(entry.target);
+          startTops.set(entry.target, entry.boundingClientRect.top);
         } else {
           activeElements.delete(entry.target);
+          startTops.delete(entry.target);
         }
       });
 
@@ -82,6 +99,7 @@
     }
     observedElements.add(el);
     el.style.willChange = 'transform';
+    el.style.transform = 'translate3d(0, 0px, 0)';
     io.observe(el);
   };
 
