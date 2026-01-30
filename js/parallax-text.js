@@ -2,6 +2,7 @@
   const CLASS_NAME = 'parallax-text';
   const DEFAULT_SPEED = 1;
   const DEFAULT_RANGE = 100;
+  const DEFAULT_DIRECTION = 'up';
   const activeElements = new Set();
   const observedElements = new Set();
   let rafId = null;
@@ -29,9 +30,14 @@
     return getNumber(el.getAttribute('data-parallax-distance'), DEFAULT_RANGE);
   };
 
+  const getDirection = (el) => {
+    const dir =
+      (el.getAttribute('data-parallax-direction') || DEFAULT_DIRECTION).toLowerCase();
+    return dir === 'down' ? 1 : -1;
+  };
+
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
-  const startTops = new WeakMap();
   const lastOffsets = new WeakMap();
 
   const update = () => {
@@ -40,17 +46,24 @@
       return;
     }
 
+    const vh = window.innerHeight || 1;
     activeElements.forEach((el) => {
       const rect = el.getBoundingClientRect();
       const lastOffset = lastOffsets.get(el) || 0;
-      const naturalTop = rect.top + lastOffset;
-      const startTop = startTops.get(el);
-      const baseline = Number.isFinite(startTop) ? startTop : naturalTop;
-      const delta = baseline - naturalTop;
+      const naturalTop = rect.top - lastOffset;
+      const elementHeight = rect.height || 1;
+      const progress = clamp(
+        (vh - naturalTop) / (vh + elementHeight),
+        0,
+        1
+      );
       const range = getRange(el);
-      const offset = clamp(delta * getSpeed(el), -range, range);
+      const direction = getDirection(el);
+      const speed = getSpeed(el);
+      const rawOffset = (progress - 0.5) * 2 * range * direction * speed;
+      const offset = clamp(rawOffset, -range, range);
       lastOffsets.set(el, offset);
-      el.style.transform = `translate3d(0, ${-offset}px, 0)`;
+      el.style.transform = `translate3d(0, ${offset}px, 0)`;
     });
 
     rafId = window.requestAnimationFrame(update);
@@ -76,10 +89,8 @@
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           activeElements.add(entry.target);
-          startTops.set(entry.target, entry.boundingClientRect.top);
         } else {
           activeElements.delete(entry.target);
-          startTops.delete(entry.target);
           lastOffsets.delete(entry.target);
           entry.target.style.transform = 'translate3d(0, 0px, 0)';
         }
@@ -115,7 +126,6 @@
     }
     observedElements.delete(el);
     activeElements.delete(el);
-    startTops.delete(el);
     lastOffsets.delete(el);
     el.style.transform = 'translate3d(0, 0px, 0)';
     io.unobserve(el);
