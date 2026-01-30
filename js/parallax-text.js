@@ -32,6 +32,7 @@
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
   const startTops = new WeakMap();
+  const lastOffsets = new WeakMap();
 
   const update = () => {
     if (activeElements.size === 0) {
@@ -39,14 +40,16 @@
       return;
     }
 
-    const vh = window.innerHeight || 1;
     activeElements.forEach((el) => {
       const rect = el.getBoundingClientRect();
+      const lastOffset = lastOffsets.get(el) || 0;
+      const naturalTop = rect.top + lastOffset;
       const startTop = startTops.get(el);
-      const baseline = Number.isFinite(startTop) ? startTop : rect.top;
-      const delta = baseline - rect.top;
+      const baseline = Number.isFinite(startTop) ? startTop : naturalTop;
+      const delta = baseline - naturalTop;
       const range = getRange(el);
       const offset = clamp(delta * getSpeed(el), -range, range);
+      lastOffsets.set(el, offset);
       el.style.transform = `translate3d(0, ${-offset}px, 0)`;
     });
 
@@ -77,6 +80,8 @@
         } else {
           activeElements.delete(entry.target);
           startTops.delete(entry.target);
+          lastOffsets.delete(entry.target);
+          entry.target.style.transform = 'translate3d(0, 0px, 0)';
         }
       });
 
@@ -100,6 +105,7 @@
     observedElements.add(el);
     el.style.willChange = 'transform';
     el.style.transform = 'translate3d(0, 0px, 0)';
+    lastOffsets.set(el, 0);
     io.observe(el);
   };
 
@@ -109,6 +115,9 @@
     }
     observedElements.delete(el);
     activeElements.delete(el);
+    startTops.delete(el);
+    lastOffsets.delete(el);
+    el.style.transform = 'translate3d(0, 0px, 0)';
     io.unobserve(el);
     if (activeElements.size === 0) {
       stopLoop();
