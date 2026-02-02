@@ -38,6 +38,12 @@ const update = () => {
   activeElements.forEach((element) => {
     const rect = element.getBoundingClientRect();
 
+    // Freeze at the last visible offset when out of view.
+    if (rect.bottom <= 0 || rect.top >= vh) {
+      activeElements.delete(element);
+      return;
+    }
+
     // Subtract previous transform to get natural position.
     const lastOffset = lastOffsets.get(element) || 0;
     const naturalTop = rect.top - lastOffset;
@@ -81,7 +87,7 @@ const io = new IntersectionObserver(
   },
   {
     root: null,
-    rootMargin: '20% 0px',
+    rootMargin: '0px',
     threshold: 0,
   }
 );
