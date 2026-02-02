@@ -165,3 +165,43 @@ body,
   width: 20px;
   height: 20px;
 }
+
+.opacity-0 {
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 600ms ease both;
+  will-change: opacity;
+}
+
+@keyframes inUp {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-inUp {
+  animation: inUp 600ms ease both;
+  will-change: opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fadeInUp,
+  .animate-inUp {
+    animation: none;
+    opacity: 1;
+  }
+}
