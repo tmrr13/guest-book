@@ -173,33 +173,29 @@ body,
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translate3d(0, 24px, 0);
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
   }
 }
 
 .animate-fadeInUp {
   animation: fadeInUp 600ms ease both;
-  will-change: opacity, transform;
+  will-change: opacity;
 }
 
 @keyframes inUp {
   from {
     opacity: 0;
-    transform: translate3d(0, 12px, 0);
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
   }
 }
 
 .animate-inUp {
   animation: inUp 600ms ease both;
-  will-change: opacity, transform;
+  will-change: opacity;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -207,6 +203,5 @@ body,
   .animate-inUp {
     animation: none;
     opacity: 1;
-    transform: none;
   }
 }
