@@ -72,8 +72,6 @@ const io = new IntersectionObserver(
         activeElements.add(element);
       } else {
         activeElements.delete(element);
-        lastOffsets.delete(element);
-        element.style.transform = 'translate3d(0,0,0)';
       }
     });
 
