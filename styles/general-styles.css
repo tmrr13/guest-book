@@ -165,3 +165,23 @@ body,
   width: 20px;
   height: 20px;
 }
+
+.reveal-text-enabled .reveal-text {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  transition: opacity 600ms ease, transform 600ms ease;
+  will-change: opacity, transform;
+}
+
+.reveal-text-enabled .reveal-text.reveal-text--visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-text-enabled .reveal-text {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
