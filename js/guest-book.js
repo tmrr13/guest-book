@@ -1,36 +1,41 @@
 
-let calendar = document.getElementById('calendar'),
-    nowDate = document.getElementById('now-date'),
-    month = document.getElementById('month');
+const calendar = document.getElementById('calendar');
+const now = new Date();
+const nowMonth = now.getMonth();
+const nowYear = now.getFullYear();
+const daysWeek = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
 
-let now = new Date(),
-    nowMonth = now.getDay(),
-    nowYear = now.getFullYear();
-    daysWeek = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
-
-function daysInMonth (month, year) {
-  return new Date(year, month, 0).getDate();
-}
-
-let quantityDays = daysInMonth(nowMonth,nowYear);
-
-function outputDays() {
-  let day = "";
-  for(let i = 1; i <= quantityDays; i++) {
-    day += "<span class='day'>" + i + "</span>";
-  }
-  return day;
+function daysInMonth(month, year) {
+  return new Date(year, month + 1, 0).getDate();
 }
 
 function outputDaysWeek() {
-  let daysWeeka = daysWeek;
+  return daysWeek
+    .map(function (dayName) {
+      return "<span class='weekday'>" + dayName + "</span>";
+    })
+    .join('');
 }
 
-console.log(daysWeeka);
+function outputDays() {
+  const quantityDays = daysInMonth(nowMonth, nowYear);
+  const firstWeekday = new Date(nowYear, nowMonth, 1).getDay();
+  let dayCells = '';
 
-let days = outputDays();
+  for (let i = 0; i < firstWeekday; i++) {
+    dayCells += "<span class='day day--empty'></span>";
+  }
 
-calendar.innerHTML = days;
+  for (let i = 1; i <= quantityDays; i++) {
+    dayCells += "<span class='day'>" + i + "</span>";
+  }
+
+  return dayCells;
+}
+
+calendar.innerHTML =
+  "<div class='days-week'>" + outputDaysWeek() + "</div>" +
+  "<div class='days-grid'>" + outputDays() + "</div>";
 
 
 

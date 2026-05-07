@@ -38,13 +38,44 @@ body,
 }
 
 #calendar {
+  width: max-content;
+  padding: @datepicker-padding-block @datepicker-padding-inline;
+  border: 1px solid @primary;
+  border-radius: 8px;
+  background: @light;
+}
+
+.days-week,
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, @datepicker-cell-width);
+  gap: 4px;
+}
+
+.days-week {
+  padding-bottom: @datepicker-padding-block;
+}
+
+.weekday,
+.day {
+  width: @datepicker-cell-width;
+  height: @datepicker-cell-height;
   display: flex;
-  flex-wrap: wrap;
-  width: 140px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.weekday {
+  color: #666;
+  font-weight: 600;
 }
 
 .day {
   background: cornflowerblue;
-  width: 20px;
-  height: 20px;
+}
+
+.day--empty {
+  background: transparent;
 }
